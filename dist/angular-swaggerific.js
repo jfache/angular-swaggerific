@@ -12,7 +12,7 @@
             /**
              * Replaces path variables with associated data properties
              * @param {string} path - The endpoint path.
-             * @param {object} data - Data defined by the user.  
+             * @param {object} data - Data defined by the user.
              * @returns {string} - Newly created path using data passed in by user.
              */
             replaceInPath: function(path, data) {
@@ -71,7 +71,7 @@
                         namespace = key.split('/')[1];
 
                         /**
-                         * If there is no path variable (i.e. '/'), then set the namespace equal to 
+                         * If there is no path variable (i.e. '/'), then set the namespace equal to
                          * the base path.
                          */
                         if (!namespace || namespace === '') {
@@ -90,7 +90,7 @@
                         self.api[namespace] = {};
                     }
 
-                    /** 
+                    /**
                      * Map HTTP call to namespace[operationId].
                      * If there is no operationId, then use method (i.e. get, post, put)
                      */
@@ -98,8 +98,8 @@
                         innerValue.operationId = innerKey;
                     }
 
-                    (self.api[namespace])[innerValue.operationId] = function(data) {
-                        return self.trigger(key, innerKey, data);
+                    (self.api[namespace])[innerValue.operationId] = function(data, headers) {
+                        return self.trigger(key, innerKey, data, headers);
                     };
                 });
             });
@@ -112,15 +112,17 @@
          * @param {string} path - The path of the endpoint.
          * @param {method} method - The method of the HTTP request (i.e. get, post, delete, put).
          * @param {data} data - User passed data.
+         * @param {Object} [headers]
          * @returns {Promise} - Returns a promise from $http which can be chained to by user.
          */
-        AngularSwaggerific.prototype.trigger = function(path, method, data) {
+        AngularSwaggerific.prototype.trigger = function(path, method, data, headers) {
             var self = this;
 
             var data = data || {};
             var newPath = util.replaceInPath(path, data);
 
             return $http({
+                headers: headers || {},
                 method: method,
                 url: self.host + newPath,
                 data: data
